@@ -1,0 +1,6 @@
+python-telegram-bot[job-queue]>=20.0
+nest-asyncio
+python-dotenv
+gspread
+google-auth
+google-api-python-client
