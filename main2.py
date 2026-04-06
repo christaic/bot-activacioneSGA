@@ -1,7 +1,6 @@
 import os, io, json, uuid, logging, sys
 from datetime import datetime
 import asyncio
-import nest_asyncio
 from dotenv import load_dotenv
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
