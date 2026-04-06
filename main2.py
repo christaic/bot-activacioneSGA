@@ -13,8 +13,6 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-nest_asyncio.apply()
-
 # ======== ENV Y CREDENCIALES ========
 load_dotenv(override=True)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
