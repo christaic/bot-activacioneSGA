@@ -46,7 +46,7 @@ ENCABEZADOS = [
     "PUERTO_UTILIZADO", "SN_ANTIGUO", "SN_NUEVO", "PHONOWIN", "PROD_ID", 
     "MOTIVO_REMAT", "OBSERVACION", 
     "FOTO_1", "FOTO_2", "FOTO_3", "FOTO_4", "FOTO_5", 
-    "MENSAJE_RECHAZO", "SUBSANACION", "POTENCIA ONT Y OLT", "ESTADO", "GESTOR", "NOTIFICADO", 
+    "MENSAJE_RECHAZO", "SUBSANACION", "POTENCIA ONT Y OLT", "GESTOR", "ESTADO", "NOTIFICADO", 
     "FECHA_HORA FIN", "CTO ANTIGUA", "OLT ANTIGUA", "OLT NUEVO", 
     "ACTUALIZACIÓN TRASLADO", "ACTUALIZACIÓN CAMBIO DE ONT", "ORDENAMIENTO", "TI"
 ]
@@ -668,7 +668,7 @@ async def manejar_resumen_final(update: Update, context: ContextTypes.DEFAULT_TY
         fila.extend(fotos_fila[:5])
 
         # 🔥 Orden: GESTOR, RECHAZO, SUBSANACION, POTENCIA, ESTADO, NOTIFICADO, FECHA_HORA FINALIZADO
-                # 🔥 Orden ajustado: RECHAZO, SUBSANACION, POTENCIA, ESTADO, GESTOR, NOTIFICADO, FECHA FINALIZADO + 7 VACÍAS
+        # 🔥 Orden ajustado: RECHAZO, SUBSANACION, POTENCIA, GESTOR, ESTADO, NOTIFICADO, FECHA FINALIZADO + 7 VACÍAS
         fila.extend(["-", "-", "-", "PENDIENTE REVISIÓN", "-", "NO", "-", "-", "-", "-", "-", "-", "-", "-"])
         
         exito, msg = gs_append_row(fila)
