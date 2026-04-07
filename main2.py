@@ -1,5 +1,5 @@
 import os, io, json, uuid, logging, sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import asyncio
 from dotenv import load_dotenv
 
@@ -12,6 +12,9 @@ import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
+
+# 🔥 Zona horaria fija de Perú (UTC-5)
+ZONA_PERU = timezone(timedelta(hours=-5))
 
 # ======== ENV Y CREDENCIALES ========
 load_dotenv(override=True)
@@ -145,7 +148,7 @@ async def verificar_cambios_estado(context: ContextTypes.DEFAULT_TYPE):
                     
                     # 🔥 MENSAJE 1: CUANDO PASA A "FINALIZADO" (Cierre épico)
                     if estado == "FINALIZADO":
-                        ahora_cierre = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        ahora_cierre = datetime.now(ZONA_PERU).strftime("%Y-%m-%d %H:%M:%S")
                         mensaje = (
                             f"✅ *ACTUALIZACIÓN DE ACTIVACIÓN*\n\n"
                             f"🎫 *Ticket:* `{ticket}`\n"
@@ -291,7 +294,7 @@ async def guardar_subsanacion(update: Update, context: ContextTypes.DEFAULT_TYPE
     if update.message.photo or update.message.document:
         file = await (update.message.photo[-1].get_file() if update.message.photo else update.message.document.get_file())
         file_bytes = await file.download_as_bytearray()
-        filename = f"SUBSANACION_{ticket}_{datetime.now().strftime('%H%M%S')}.jpg"
+        filename = f"SUBSANACION_{ticket}_{datetime.now(ZONA_PERU).strftime('%H%M%S')}.jpg"
         evidencia = upload_image_to_google_drive(file_bytes, filename)
         if not evidencia:
             await update.message.reply_text("❌ Error subiendo la foto a Drive. Intenta de nuevo.")
@@ -610,7 +613,7 @@ async def manejar_resumen_final(update: Update, context: ContextTypes.DEFAULT_TY
         
         reg = context.user_data["registro"]["DATOS"]
         op = context.user_data["registro"]["OPERACION"]
-        fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        fecha_hora = datetime.now(ZONA_PERU).strftime("%Y-%m-%d %H:%M:%S")
 
         nombre_completo = NOMBRES_OPERACIONES.get(op, op)
         sn_antiguo_o_actual = reg.get("SN_ANTIGUO", reg.get("SN_ACTUAL", "-"))
