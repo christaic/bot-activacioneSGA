@@ -39,15 +39,18 @@ else:
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
 
-# 🔥 TUS ENCABEZADOS REORDENADOS (31 COLUMNAS)
+# 🔥 TUS ENCABEZADOS AHORA CON 39 COLUMNAS (ESQUELETO ACTUALIZADO)
 ENCABEZADOS = [
     "USER_ID", "FECHA_HORA", "TIPO_OPERACION", "MARCA", "TICKET", "COD_CLIENTE", "CLIENTE", "DNI",
     "DIRECCION", "DISTRITO", "CONTRATA", "TECNICO", "CTO",
     "PUERTO_UTILIZADO", "SN_ANTIGUO", "SN_NUEVO", "PHONOWIN", "PROD_ID", 
     "MOTIVO_REMAT", "OBSERVACION", 
     "FOTO_1", "FOTO_2", "FOTO_3", "FOTO_4", "FOTO_5", 
-    "GESTOR", "MENSAJE_RECHAZO", "SUBSANACION", "POTENCIA ONT Y OLT", "ESTADO", "NOTIFICADO", "FECHA_HORA FIN"
+    "MENSAJE_RECHAZO", "SUBSANACION", "POTENCIA ONT Y OLT", "ESTADO", "GESTOR", "NOTIFICADO", 
+    "FECHA_HORA FIN", "CTO ANTIGUA", "OLT ANTIGUA", "OLT NUEVO", 
+    "ACTUALIZACIÓN TRASLADO", "ACTUALIZACIÓN CAMBIO DE ONT", "ORDENAMIENTO", "TI"
 ]
+
 
 # ======== ESTADOS ========
 SELECCIONAR_OP, SELECCIONAR_MARCA, PREGUNTAR_DATO, CONFIRMAR_DATO = range(4)
@@ -109,7 +112,11 @@ async def verificar_cambios_estado(context: ContextTypes.DEFAULT_TYPE):
             gestor = str(row.get("GESTOR", "-"))
             motivo = str(row.get("MENSAJE_RECHAZO", "-"))
             phonowin = str(row.get("PHONOWIN", "")).strip().upper()
-            potencia_final = str(row.get("POTENCIA ONT Y OLT", "-")).strip() #NUEVO LUCAS
+            potencia_final = str(row.get("POTENCIA ONT Y OLT", "-")).strip()
+            
+            # 🔥 NUEVO: Extraemos el Cliente y el DNI
+            cliente = str(row.get("CLIENTE", "N/A"))
+            dni = str(row.get("DNI", "N/A"))
 
             if notificado == "ENVIAR" and user_id:
                 ticket = row.get("TICKET", "N/A")
@@ -118,8 +125,10 @@ async def verificar_cambios_estado(context: ContextTypes.DEFAULT_TYPE):
                 # 🔥 LÓGICA DE AUDITORÍA: Detecta si es Rechazo o Aprobación
                 if "RECHAZADO" in estado:
                     mensaje = (
-                        f"🚨 *¡ATENCIÓN! ACTIVACIÓN RECHAZADA* 🚨\n\n"
+                        f"🚨 *¡ATENCIÓN! TICKET RECHAZADO* 🚨\n\n"
                         f"🎫 *Ticket:* `{ticket}`\n"
+                        f"👤 *Cliente:* {cliente}\n"
+                        f"🪪 *DNI/CE:* {dni}\n"
                         f"🛠️ *Operación:* {op}\n"
                         f"👨‍💻 *Revisado por:* {gestor}\n"
                         f"❌ *Motivo:* {motivo}\n"
@@ -146,30 +155,34 @@ async def verificar_cambios_estado(context: ContextTypes.DEFAULT_TYPE):
                     elif phonowin == "NO":
                         tiempo_activacion = "⏳ *Tiempo estimado de activación:* 10 minutos."
                     
-                    # 🔥 MENSAJE 1: CUANDO PASA A "FINALIZADO" (Cierre épico)
+                    # 🔥 MENSAJE 1: CUANDO PASA A "FINALIZADO"
                     if estado == "FINALIZADO":
                         ahora_cierre = datetime.now(ZONA_PERU).strftime("%Y-%m-%d %H:%M:%S")
                         mensaje = (
                             f"✅ *ACTUALIZACIÓN DE ACTIVACIÓN*\n\n"
                             f"🎫 *Ticket:* `{ticket}`\n"
+                            f"👤 *Cliente:* {cliente}\n"
+                            f"🪪 *DNI/CE:* {dni}\n"
                             f"🛠️ *Operación:* {op}\n"
                             f"👨‍💻 *Revisado por:* {gestor}\n"
-                            f"📍 *Estado Actual:* `{estado}`\n\n"
-                            f"⚡ *Potencias (ONT y OLT):* `{potencia_final}`\n\n"
+                            f"📍 *Estado Actual:* `{estado}`\n"
+                            f"⚡ *Potencias:* `{potencia_final}`\n\n"
                             f"🔥 *HE FINALIZADO TU CASO, EL SERVICIO YA SE ENCUENTRA ACTIVADO.* 🔥\n\n"
                             f"💪 Gracias, recuerda escribir /start para un siguiente registro🚀💪"
                         )
-                        # 🔥 SELLA LA FECHA EN LA COLUMNA 32 DEL EXCEL
+                        # 🔥 SELLA LA FECHA EN LA COLUMNA DEL EXCEL
                         try:
-                            sheet.update_cell(i, ENCABEZADOS.index("FECHA_HORA FIN") + 1, ahora_cierre)
+                            sheet.update_cell(i, ENCABEZADOS.index("FECHA FINALIZADO") + 1, ahora_cierre)
                         except Exception as e:
                             logger.error(f"❌ Error sellando fecha final: {e}")
-                            
-                    # 🔥 MENSAJE 2: CUANDO PASA A "EN REVISIÓN" (Aquí van los tiempos)
+                    
+                    # 🔥 MENSAJE 2: CUANDO PASA A "EN REVISIÓN"
                     elif estado == "EN REVISIÓN":
                         mensaje = (
                             f"✅ *ACTUALIZACIÓN DE ACTIVACIÓN*\n\n"
                             f"🎫 *Ticket:* `{ticket}`\n"
+                            f"👤 *Cliente:* {cliente}\n"
+                            f"🪪 *DNI/CE:* {dni}\n"
                             f"🛠️ *Operación:* {op}\n"
                             f"👨‍💻 *Revisado por:* {gestor}\n"
                             f"📍 *Estado Actual:* `{estado}`\n\n"
@@ -178,11 +191,13 @@ async def verificar_cambios_estado(context: ContextTypes.DEFAULT_TYPE):
                         if tiempo_activacion:
                             mensaje += f"\n\n{tiempo_activacion}"
                             
-                    # 🔥 MENSAJE 3: CUALQUIER OTRO ESTADO (Por si acaso agregas más a futuro)
+                    # 🔥 MENSAJE 3: CUALQUIER OTRO ESTADO
                     else:
                         mensaje = (
                             f"✅ *ACTUALIZACIÓN DE ACTIVACIÓN*\n\n"
                             f"🎫 *Ticket:* `{ticket}`\n"
+                            f"👤 *Cliente:* {cliente}\n"
+                            f"🪪 *DNI/CE:* {dni}\n"
                             f"🛠️ *Operación:* {op}\n"
                             f"👨‍💻 *Revisado por:* {gestor}\n"
                             f"📍 *Estado Actual:* `{estado}`\n\n"
@@ -198,6 +213,7 @@ async def verificar_cambios_estado(context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         logger.error(f"❌ Error en la tarea de vigilancia: {e}")
+        
 
 # ======== FUNCIONES DE DRIVE Y SHEETS ========
 def upload_image_to_google_drive(file_bytes: bytes, filename: str):
@@ -652,8 +668,9 @@ async def manejar_resumen_final(update: Update, context: ContextTypes.DEFAULT_TY
         fila.extend(fotos_fila[:5])
 
         # 🔥 Orden: GESTOR, RECHAZO, SUBSANACION, POTENCIA, ESTADO, NOTIFICADO, FECHA_HORA FINALIZADO
-        fila.extend(["-", "-", "-", "-", "PENDIENTE REVISIÓN", "NO", "-"])
-
+                # 🔥 Orden ajustado: RECHAZO, SUBSANACION, POTENCIA, ESTADO, GESTOR, NOTIFICADO, FECHA FINALIZADO + 7 VACÍAS
+        fila.extend(["-", "-", "-", "PENDIENTE REVISIÓN", "-", "NO", "-", "-", "-", "-", "-", "-", "-", "-"])
+        
         exito, msg = gs_append_row(fila)
         
         if exito:
