@@ -669,7 +669,7 @@ async def manejar_resumen_final(update: Update, context: ContextTypes.DEFAULT_TY
 
         # 🔥 Orden: GESTOR, RECHAZO, SUBSANACION, POTENCIA, ESTADO, NOTIFICADO, FECHA_HORA FINALIZADO
         # 🔥 Orden ajustado: RECHAZO, SUBSANACION, POTENCIA, GESTOR, ESTADO, NOTIFICADO, FECHA FINALIZADO + 7 VACÍAS
-        fila.extend(["-", "-", "-", "PENDIENTE REVISIÓN", "-", "NO", "-", "-", "-", "-", "-", "-", "-", "-"])
+        fila.extend(["-", "-", "-", "-","PENDIENTE REVISIÓN", "NO", "-", "-", "-", "-", "-", "-", "-", "-"])
         
         exito, msg = gs_append_row(fila)
         
