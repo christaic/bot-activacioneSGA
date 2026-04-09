@@ -41,7 +41,8 @@ creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPE
 
 # 🔥 TUS ENCABEZADOS AHORA CON 39 COLUMNAS (ESQUELETO ACTUALIZADO)
 ENCABEZADOS = [
-    "USER_ID", "FECHA_HORA", "TIPO_OPERACION", "MARCA", "TICKET", "COD_CLIENTE", "CLIENTE", "DNI",
+    "USER_ID", "FECHA_HORA", "TIPO_OPERACION", "COD_CLIENTE", "CLIENTE", "DNI",
+    "MARCA", "TICKET",
     "DIRECCION", "DISTRITO", "CONTRATA", "TECNICO", "CTO",
     "PUERTO_UTILIZADO", "SN_ANTIGUO", "SN_NUEVO", "PHONOWIN", "PROD_ID", 
     "MOTIVO_REMAT", "OBSERVACION", 
@@ -284,7 +285,7 @@ PREGUNTAS = {
     "FOTO_ONT_ACTUAL": "📸 Envía la *FOTO DE LA SN DE LA ONT ACTUAL*:",
     "FOTO_POTENCIA": "📸 Envía la *FOTO DE LA POTENCIA INTERNA*:",
     "FOTO_CTO": "📸 Envía la *FOTO DE LA CTO CERRADA*:",
-    "FOTO_PUERTO": "📸 Envía la *FOTO DEL PUERTO UTILIZADO*:"
+    "FOTO_PUERTO": "📸 Envía la *FOTO DE LA MEDICIÓN DEL PUERTO UTILIZADO DE LA CTO*:"
 }
 
 # =======================================================
@@ -639,11 +640,11 @@ async def manejar_resumen_final(update: Update, context: ContextTypes.DEFAULT_TY
             update.effective_user.id,                    # 0: USER_ID
             fecha_hora,                                  # 1: FECHA_HORA
             nombre_completo,                             # 2: TIPO_OPERACION
-            reg.get("MARCA", "-"),                       # 3: MARCA
-            reg.get("TICKET", "-"),                      # 4: TICKET
-            reg.get("CODIGO CLIENTE", "-"),              # 5: COD_CLIENTE
-            reg.get("CLIENTE", "-"),                     # 6: CLIENTE
-            reg.get("DNI ó CE", "-"),                    # 7: DNI
+            reg.get("CODIGO CLIENTE", "-"),              # 3: COD_CLIENTE
+            reg.get("CLIENTE", "-"),                     # 4: CLIENTE
+            reg.get("DNI ó CE", "-"),                    # 5: DNI
+            reg.get("MARCA", "-"),                       # 6: MARCA
+            reg.get("TICKET", "-"),                      # 7: TICKET
             reg.get("DIRECCION", "-"),                   # 8: DIRECCION
             reg.get("DISTRITO", "-"),                    # 9: DISTRITO
             reg.get("PARTNER", "-"),                     # 10: CONTRATA
