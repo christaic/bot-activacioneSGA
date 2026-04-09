@@ -279,9 +279,9 @@ PREGUNTAS = {
     "DISTRITO": "🗺️ Ingresa el *DISTRITO*:",
     "OBS": "📝 Ingresa la *OBSERVACIÓN*:",
     "MOTIVO": "❓ Ingresa el *MOTIVO DE REMATRICULACIÓN*:",
-    "FOTO_ONT_NUEVA": "📸 Envía la *FOTO DE LA ONT NUEVA*:",
-    "FOTO_ONT_ANTIGUA": "📸 Envía la *FOTO DE LA ONT ANTIGUA*:",
-    "FOTO_ONT_ACTUAL": "📸 Envía la *FOTO DE LA ONT ACTUAL*:",
+    "FOTO_ONT_NUEVA": "📸 Envía la *FOTO DE LA SN DE LA ONT NUEVA*:",
+    "FOTO_ONT_ANTIGUA": "📸 Envía la *FOTO DE LA SN DE LA ONT ANTIGUA*:",
+    "FOTO_ONT_ACTUAL": "📸 Envía la *FOTO DE LA SN DE LA ONT ACTUAL*:",
     "FOTO_POTENCIA": "📸 Envía la *FOTO DE LA POTENCIA INTERNA*:",
     "FOTO_CTO": "📸 Envía la *FOTO DE LA CTO CERRADA*:",
     "FOTO_PUERTO": "📸 Envía la *FOTO DEL PUERTO UTILIZADO*:"
