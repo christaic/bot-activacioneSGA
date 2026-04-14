@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import asyncio
 from dotenv import load_dotenv
 
+from telegram.constants import ChatAction
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler,
@@ -537,6 +538,8 @@ async def recibir_foto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⚠️ Ahora necesito texto, no una foto.")
         return PREGUNTAR_DATO
         
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO)
+    
     msg_subiendo = await update.message.reply_text("☁️ Subiendo foto...")
     file = await (update.message.photo[-1].get_file() if update.message.photo else update.message.document.get_file())
     file_bytes = await file.download_as_bytearray()
@@ -551,7 +554,7 @@ async def recibir_foto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         kb = [
             [InlineKeyboardButton("✅ Confirmar", callback_data="CONFIRMAR"), InlineKeyboardButton("📸 Corregir", callback_data="CORREGIR")]
         ]
-        await update.message.reply_text("✅ Foto subida correctamente..\n\nElige una opción:", reply_markup=InlineKeyboardMarkup(kb))
+        await update.message.reply_text("✅ Foto subida correctamente.\n\nElige una opción:", reply_markup=InlineKeyboardMarkup(kb))
         return CONFIRMAR_DATO
     else:
         await update.message.reply_text("❌ Error subiendo a Drive. Intenta de nuevo.")
@@ -700,8 +703,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     validar_entorno_estricto()
 
-
-# 🔥 Le subimos la "paciencia" al bot a 60 segundos para que descargue fotos pesadas sin llorar
+    # 🔥 Le subimos la "paciencia" al bot a 60 segundos para que descargue fotos pesadas sin llorar
     app = (
         ApplicationBuilder()
         .token(BOT_TOKEN)
@@ -713,7 +715,7 @@ def main():
     )
 
     job_queue = app.job_queue
-    job_queue.run_repeating(verificar_cambios_estado, interval=10, first=5)
+    job_queue.run_repeating(verificar_cambios_estado, interval=30, first=5)
 
     # 🔥 NUEVO HANDLER: Atrapa las respuestas del botón de SUBSANAR
     subsanar_handler = ConversationHandler(
@@ -744,6 +746,20 @@ def main():
     app.add_handler(conv_handler)
     app.add_handler(CallbackQueryHandler(manejar_resumen_final, pattern="^FINAL_"))
     
+    # ==========================================
+    # 🌟 EL TOQUE FINOLIS: Menú de comandos
+    # ==========================================
+    async def setup_commands(app_instance):
+        from telegram import BotCommand
+        comandos = [
+            BotCommand("start", "🚀 Iniciar un nuevo registro"),
+            BotCommand("cancel", "❌ Cancelar la operación actual")
+        ]
+        await app_instance.bot.set_my_commands(comandos)
+
+    app.post_init = setup_commands # Esto ejecuta la función justo antes de arrancar
+
+    # 🔥 ARRANQUE DEL BOT
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
