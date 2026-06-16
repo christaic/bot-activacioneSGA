@@ -1,4 +1,5 @@
 python-telegram-bot
+APScheduler
 nest-asyncio
 python-dotenv
 gspread
