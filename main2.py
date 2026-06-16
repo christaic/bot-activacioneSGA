@@ -363,7 +363,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "1⃣ *CAMBIO DE ONT*\n"
         "2⃣ *TRASLADOS / CAMBIO CTO / CAMBIO PUERTO*\n"
         "3⃣ *REMATRICULACIÓN*\n"
-        "4⃣ *TRASLADOS / CAMBIO CTO / PUERTO + CAMBIO ONT*"
+        "4⃣ *TRASLADOS / CAMBIO CTO / PUERTO + CAMBIO ONT*\n"
         "5⃣ *CAMBIO DE CTO POR RETIRO DE SPLITTER*" # PARA RETIRO DE SPLITTERS
     )
     
