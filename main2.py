@@ -375,7 +375,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [
             InlineKeyboardButton("3⃣", callback_data="OP_REMATRICULACION"), 
             InlineKeyboardButton("4⃣", callback_data="OP_TRASLADO_CAMBIO")
-        ]
+        ],
         [
             InlineKeyboardButton("5⃣", callback_data="OP_CAMBIO_CTO_SPLITTER")
         ]
